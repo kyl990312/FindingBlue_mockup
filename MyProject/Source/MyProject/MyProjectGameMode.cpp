@@ -13,7 +13,5 @@ AMyProjectGameMode::AMyProjectGameMode()
 
 
 void AMyProjectGameMode::PostLogin(APlayerController* NewPlayer) {
-	ABLOG(Warning, TEXT("PostLogin Begin"));
 	Super::PostLogin(NewPlayer);
-	ABLOG(Warning, TEXT("PostLogin End"));
 }

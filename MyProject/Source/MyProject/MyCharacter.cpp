@@ -16,8 +16,11 @@ AMyCharacter::AMyCharacter()
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
 
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -40.0f), FRotator(0.0f, -90.0f, 0.0f));
-	SpringArm->TargetArmLength = 400.0f;
+	GetCapsuleComponent()->SetCapsuleHalfHeight(45.0f);
+	GetCapsuleComponent()->SetCapsuleRadius(15.0f);	
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -45.0f), FRotator(0.0f, -90.0f, 0.0f));
+
+	SpringArm->TargetArmLength = 0.0f;
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
 
 	// set mesh
@@ -59,7 +62,7 @@ void AMyCharacter::SetControlMode(EControlMode ControlMode)
 		SpringArm->bDoCollisionTest = true;
 		bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
-		GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, RotateRate, 0.0f);
 		break;
 	}
 }
@@ -84,12 +87,12 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::MoveForward(float NewAxisValue)
 {
-	AddMovementInput(GetActorForwardVector(), NewAxisValue);
+	AddMovementInput(GetActorForwardVector(), NewAxisValue * DefaultSpeedRate);
 }
 
 void AMyCharacter::MoveRight(float NewAxisValue)
 {
-	AddMovementInput(GetActorRightVector(), NewAxisValue);
+	AddMovementInput(GetActorRightVector(), NewAxisValue * DefaultSpeedRate);
 }
 
 void AMyCharacter::LookUp(float NewAxisValue)

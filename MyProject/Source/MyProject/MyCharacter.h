@@ -46,4 +46,7 @@ private:
 	void Turn(float NewAxisValue);
 	void Run();
 
+	const float DefaultSpeedRate = 0.1f;
+	const float RotateRate = 200.0f;
+
 };
