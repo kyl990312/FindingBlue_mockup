@@ -16,8 +16,16 @@ public:
 	AMyCharacter();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	enum class EControlMode {
+		FPS,
+		GTA,
+	};
+
+	// Called when the game starts or when spawned
+	void SetControlMode(EControlMode ControlMode);
+	EControlMode CurrentControlMode = EControlMode::GTA;
 
 public:	
 	// Called every frame

@@ -1,3 +1,12 @@
 ﻿  Using 'git status' to determine working set for adaptive non-unity build (D:\Projects\FindingBlue_mockup).
-  Target is up to date
-  Total execution time: 0.43 seconds
+  Building MyProjectEditor...
+  Using Visual Studio 2022 14.30.30706 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.30.30705) and Windows 10.0.19041.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+  Building 4 actions with 12 processes...
+    [1/4] MyCharacter.cpp
+    [2/4] UE4Editor-MyProject-0006.lib
+       D:\Projects\FindingBlue_mockup\MyProject\Intermediate\Build\Win64\UE4Editor\Development\MyProject\UE4Editor-MyProject-0006.lib 라이브러리 및 D:\Projects\FindingBlue_mockup\MyProject\Intermediate\Build\Win64\UE4Editor\Development\MyProject\UE4Editor-MyProject-0006.exp 개체를 생성하고 있습니다.
+    [3/4] UE4Editor-MyProject-0006.dll
+       D:\Projects\FindingBlue_mockup\MyProject\Intermediate\Build\Win64\UE4Editor\Development\MyProject\UE4Editor-MyProject-0006.suppressed.lib 라이브러리 및 D:\Projects\FindingBlue_mockup\MyProject\Intermediate\Build\Win64\UE4Editor\Development\MyProject\UE4Editor-MyProject-0006.suppressed.exp 개체를 생성하고 있습니다.
+    [4/4] MyProjectEditor.target
+  Total time in Parallel executor: 3.02 seconds
+  Total execution time: 3.55 seconds

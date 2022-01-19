@@ -33,6 +33,8 @@ AMyCharacter::AMyCharacter()
 	if (PLAYER_ANIM.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(PLAYER_ANIM.Class);
 	}
+
+	SetControlMode(EControlMode::GTA);
 }
 
 // Called when the game starts or when spawned
@@ -40,6 +42,26 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AMyCharacter::SetControlMode(EControlMode ControlMode)
+{
+	CurrentControlMode = ControlMode;
+	switch (CurrentControlMode)
+	{
+	case EControlMode::GTA:
+		SpringArm->TargetArmLength = 450.0f;
+		SpringArm->SetRelativeRotation(FRotator::ZeroRotator);
+		SpringArm->bUsePawnControlRotation = true;
+		SpringArm->bInheritPitch = true;
+		SpringArm->bInheritRoll = true;
+		SpringArm->bInheritYaw = true;
+		SpringArm->bDoCollisionTest = true;
+		bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+		break;
+	}
 }
 
 // Called every frame
@@ -62,25 +84,21 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::MoveForward(float NewAxisValue)
 {
-	ABLOG(Log, TEXT("MoveForward: %f"), NewAxisValue);
 	AddMovementInput(GetActorForwardVector(), NewAxisValue);
 }
 
 void AMyCharacter::MoveRight(float NewAxisValue)
 {
-	ABLOG(Log, TEXT("MoveRight: %f"), NewAxisValue);
 	AddMovementInput(GetActorRightVector(), NewAxisValue);
 }
 
 void AMyCharacter::LookUp(float NewAxisValue)
 {
-	ABLOG(Log, TEXT("LookUp: %f"), NewAxisValue);
 	AddControllerPitchInput(NewAxisValue);
 }
 
 void AMyCharacter::Turn(float NewAxisValue)
 {
-	ABLOG(Log, TEXT("Turn: %f"), NewAxisValue);
 	AddControllerYawInput(NewAxisValue);
 }
 
