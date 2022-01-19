@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"D:\\Projects\\FindingBlue_mockup\\MyProject\\Source\\MyProject\\MyProject.Build.cs",
+		"D:\\Projects\\FindingBlue_mockup\\MyProject\\Source\\MyProject.Target.cs",
+		"D:\\Projects\\FindingBlue_mockup\\MyProject\\Source\\MyProjectEditor.Target.cs"
+	],
+	"EngineVersion": "4.27.2"
+}
