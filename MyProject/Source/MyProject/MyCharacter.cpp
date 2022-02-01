@@ -38,6 +38,15 @@ AMyCharacter::AMyCharacter()
 	}
 
 	SetControlMode(EControlMode::GTA);
+
+	CurrentSpeedRate = DefaultSpeedRate;
+
+	OwnWeapons.Emplace(UEWeaponType::Stick);
+	CurrentWeapon = OwnWeapons[0];
+	// test
+	OwnWeapons.Emplace(UEWeaponType::AR);
+	OwnWeapons.Emplace(UEWeaponType::Sniper);
+
 }
 
 // Called when the game starts or when spawned
@@ -53,7 +62,7 @@ void AMyCharacter::SetControlMode(EControlMode ControlMode)
 	switch (CurrentControlMode)
 	{
 	case EControlMode::GTA:
-		SpringArm->TargetArmLength = 450.0f;
+		SpringArm->TargetArmLength = 300.0f;
 		SpringArm->SetRelativeRotation(FRotator::ZeroRotator);
 		SpringArm->bUsePawnControlRotation = true;
 		SpringArm->bInheritPitch = true;
@@ -71,6 +80,12 @@ void AMyCharacter::SetControlMode(EControlMode ControlMode)
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//if (GetCharacterMovement()->IsFalling()) {
+	//	ABLOG(Log,TEXT("Jump"))
+	//}
+	//else {
+	//	ABLOG(Log,TEXT("OnGround"))
+	//}
 }
 
 // Called to bind functionality to input
@@ -79,6 +94,11 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// bind input
+	PlayerInputComponent->BindAction(TEXT("Run"), EInputEvent::IE_Pressed, this, &AMyCharacter::RunStart);
+	PlayerInputComponent->BindAction(TEXT("Run"), EInputEvent::IE_Released, this, &AMyCharacter::RunEnd);
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMyCharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("Weapon"), EInputEvent::IE_Pressed, this, &AMyCharacter::ChangeWeapon);
+
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AMyCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AMyCharacter::LookUp);
@@ -87,12 +107,12 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::MoveForward(float NewAxisValue)
 {
-	AddMovementInput(GetActorForwardVector(), NewAxisValue * DefaultSpeedRate);
+	AddMovementInput(FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::X), NewAxisValue * CurrentSpeedRate);
 }
 
 void AMyCharacter::MoveRight(float NewAxisValue)
 {
-	AddMovementInput(GetActorRightVector(), NewAxisValue * DefaultSpeedRate);
+	AddMovementInput(FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::Y), NewAxisValue * CurrentSpeedRate);
 }
 
 void AMyCharacter::LookUp(float NewAxisValue)
@@ -103,5 +123,45 @@ void AMyCharacter::LookUp(float NewAxisValue)
 void AMyCharacter::Turn(float NewAxisValue)
 {
 	AddControllerYawInput(NewAxisValue);
+}
+
+void AMyCharacter::RunStart()
+{
+	CurrentSpeedRate = RunSpeedRate;
+}
+
+void AMyCharacter::RunEnd()
+{
+	CurrentSpeedRate = DefaultSpeedRate;
+}
+
+void AMyCharacter::ChangeWeapon(FKey key)
+{
+	FName keyName = key.GetFName();
+	if (keyName == FName(TEXT("One"))) {
+		CurrentWeapon = OwnWeapons[0];
+	}
+	else if (keyName == FName(TEXT("Two")) && OwnWeapons.Num() >= 2) {
+		CurrentWeapon = OwnWeapons[1];
+	}
+	else if (keyName == FName(TEXT("Three")) && OwnWeapons.Num() >= 3) {
+		CurrentWeapon = OwnWeapons[2];
+	}
+}
+
+bool AMyCharacter::GetIsRunning()
+{
+	return RunSpeedRate == CurrentSpeedRate;
+}
+
+int AMyCharacter::GetCurrentWeapon()
+{
+	if (CurrentWeapon == UEWeaponType::Stick) {
+		return 0;
+	}
+	else if (CurrentWeapon == UEWeaponType::AR || CurrentWeapon == UEWeaponType::Sniper) {
+		return 1;
+	}
+	return -1;
 }
 
