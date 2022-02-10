@@ -23,7 +23,6 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			IsInAir = Character->GetCharacterMovement()->IsFalling();
 			IsRunning = Character->GetIsRunning();
 			CurrentWeapon = Character->GetCurrentWeapon();
-			ABLOG(Log, TEXT("current weapon : %d"), CurrentWeapon);
 		}
 	}
 }

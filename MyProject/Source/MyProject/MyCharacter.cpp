@@ -2,6 +2,8 @@
 
 
 #include "MyCharacter.h"
+#include "MyStick.h"
+#include "MyGun.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -24,15 +26,15 @@ AMyCharacter::AMyCharacter()
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
 
 	// set mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh>SK_PLAYER(TEXT("/Game/Character/Models/Character_Rig.Character_Rig"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh>SK_PLAYER(TEXT("/Game/Character/Character_Rig.Character_Rig"));
 	if (SK_PLAYER.Succeeded()) {
-		ABLOG(Log, TEXT("find Character_Rig skeletal mesh"));
 		GetMesh()->SetSkeletalMesh(SK_PLAYER.Object);
 	}
 
+	
 	//set animation
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> PLAYER_ANIM(TEXT("/Game/Character/Animations_Sequences/Player_Blueprint.Player_Blueprint_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> PLAYER_ANIM(TEXT("/Game/Character/Player_Blueprint.Player_Blueprint_C"));
 	if (PLAYER_ANIM.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(PLAYER_ANIM.Class);
 	}
@@ -41,19 +43,20 @@ AMyCharacter::AMyCharacter()
 
 	CurrentSpeedRate = DefaultSpeedRate;
 
-	OwnWeapons.Emplace(UEWeaponType::Stick);
-	CurrentWeapon = OwnWeapons[0];
-	// test
-	OwnWeapons.Emplace(UEWeaponType::AR);
-	OwnWeapons.Emplace(UEWeaponType::Sniper);
-
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
+
 	Super::BeginPlay();
-	
+	InitializeWeapons();
+
+	AddNewWeapon(UEWeaponType::Stick);
+	CurrentWeapon = OwnWeapons[0];
+	//test
+	AddNewWeapon(UEWeaponType::AR);
+	AddNewWeapon(UEWeaponType::Sniper);
 }
 
 void AMyCharacter::SetControlMode(EControlMode ControlMode)
@@ -80,12 +83,6 @@ void AMyCharacter::SetControlMode(EControlMode ControlMode)
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//if (GetCharacterMovement()->IsFalling()) {
-	//	ABLOG(Log,TEXT("Jump"))
-	//}
-	//else {
-	//	ABLOG(Log,TEXT("OnGround"))
-	//}
 }
 
 // Called to bind functionality to input
@@ -137,6 +134,13 @@ void AMyCharacter::RunEnd()
 
 void AMyCharacter::ChangeWeapon(FKey key)
 {
+	// hide current weapon
+	ABLOG(Warning,TEXT("Pre Weapon(int) : %d"), (int32)CurrentWeapon)
+	if (Weapons[(int32)CurrentWeapon-1] != nullptr) {
+		SetEnableWeapon(Weapons[(int32)CurrentWeapon - 1], false);
+	}
+
+	// set current weapon type
 	FName keyName = key.GetFName();
 	if (keyName == FName(TEXT("One"))) {
 		CurrentWeapon = OwnWeapons[0];
@@ -147,7 +151,57 @@ void AMyCharacter::ChangeWeapon(FKey key)
 	else if (keyName == FName(TEXT("Three")) && OwnWeapons.Num() >= 3) {
 		CurrentWeapon = OwnWeapons[2];
 	}
+
+	//// show new weapon
+	if (Weapons[(int32)CurrentWeapon-1] != nullptr) {
+		SetEnableWeapon(Weapons[(int32)CurrentWeapon - 1], true);
+	}
+	ABLOG(Warning, TEXT("Pre Weapon(int) : %d"), (int32)CurrentWeapon)
 }
+
+void AMyCharacter::InitializeWeapons()
+{
+	// create new weapons and set weapons to socekt
+	for (int i = 1; i < 4; ++i) {
+		AMyWeapon* NewWeapon = nullptr;
+		FName Socket(TEXT(""));
+		TSubclassOf<class AMyWeapon> WeaponClass;
+
+		switch ((UEWeaponType)i)
+		{
+		case UEWeaponType::Stick:
+
+			WeaponClass = AMyStick::StaticClass();
+			NewWeapon = GetWorld()->SpawnActor<AMyStick>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+			Socket = TEXT("Stick-rSocket");
+			break;
+		case UEWeaponType::Sniper:
+		case UEWeaponType::AR:
+			WeaponClass = AMyGun::StaticClass();
+			NewWeapon = GetWorld()->SpawnActor<AMyGun>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+			Socket = TEXT("Gun-rSocket");
+			break;
+		default:
+			break;
+		}
+
+		if (NewWeapon != nullptr) {
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
+			NewWeapon->SetOwner(this);
+			SetEnableWeapon(NewWeapon,false);
+			Weapons.Add(NewWeapon);
+		}
+	}
+
+	SetEnableWeapon(Weapons[0], true);
+}
+
+void AMyCharacter::SetEnableWeapon(AMyWeapon* Target, bool Enable)
+{
+	Target->SetActorEnableCollision(Enable);
+	Target->SetActorHiddenInGame(!Enable);
+}
+
 
 bool AMyCharacter::GetIsRunning()
 {
@@ -164,4 +218,11 @@ int AMyCharacter::GetCurrentWeapon()
 	}
 	return -1;
 }
+
+void AMyCharacter::AddNewWeapon(UEWeaponType NewWeaponType)
+{
+	ABLOG(Log, TEXT("add new Weapon type : %d"), (int32)NewWeaponType);
+	OwnWeapons.Add(NewWeaponType);
+}
+
 

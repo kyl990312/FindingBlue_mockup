@@ -35,6 +35,9 @@ protected:
 	void SetControlMode(EControlMode ControlMode);
 	EControlMode CurrentControlMode = EControlMode::GTA;
 
+	void InitializeWeapons();
+	void SetEnableWeapon(class AMyWeapon* Target, bool Enable);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -44,6 +47,7 @@ public:
 
 	bool GetIsRunning();
 	int GetCurrentWeapon();
+	void AddNewWeapon(UEWeaponType NewWeaponType);
 
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
 		USpringArmComponent* SpringArm;
@@ -63,8 +67,10 @@ private:
 	const float RunSpeedRate = 0.3f;
 	const float RotateRate = 200.0f;
 	float CurrentSpeedRate = 0.0f;
+	bool JumpInput = false;
 	
 	UEWeaponType CurrentWeapon = UEWeaponType::None;
 	UPROPERTY(VisibleAnyWhere, Category=Weapon)
 	TArray<UEWeaponType> OwnWeapons;
+	TArray<class AMyWeapon*> Weapons;
 };
