@@ -9,6 +9,11 @@ UMyAnimInstance::UMyAnimInstance() {
 	IsInAir = false;
 	IsRunning = false;
 	CurrentWeapon =0;
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>ATTACK_MONTAGE(TEXT("/Game/Character/AttackMontage.AttackMontage"));
+	if (ATTACK_MONTAGE.Succeeded()) {
+		AttackMontage = ATTACK_MONTAGE.Object;
+	}
 }
 
 void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -23,6 +28,27 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			IsInAir = Character->GetCharacterMovement()->IsFalling();
 			IsRunning = Character->GetIsRunning();
 			CurrentWeapon = Character->GetCurrentWeapon();
+			Dead = Character->GetDead();
 		}
 	}
+}
+
+void UMyAnimInstance::PlayAttackMontage(int32 Weapon)
+{
+	Montage_Play(AttackMontage, 1.0f);
+	switch (Weapon)
+	{
+	case 0:
+		Montage_JumpToSection(FName(TEXT("StickAttack")), AttackMontage);
+		break;
+	case 1:
+		Montage_JumpToSection(FName(TEXT("GunAttackSlow")), AttackMontage);
+		break;
+	}
+
+}
+
+void UMyAnimInstance::AnimNotify_HitCheck()
+{
+	OnHitCheck.Broadcast();
 }

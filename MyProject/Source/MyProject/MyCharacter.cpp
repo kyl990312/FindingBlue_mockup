@@ -4,6 +4,7 @@
 #include "MyCharacter.h"
 #include "MyStick.h"
 #include "MyGun.h"
+#include "MyAnimInstance.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -42,6 +43,7 @@ AMyCharacter::AMyCharacter()
 	SetControlMode(EControlMode::GTA);
 
 	CurrentSpeedRate = DefaultSpeedRate;
+	CurrentHp = MaxHp;
 
 }
 
@@ -95,6 +97,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Run"), EInputEvent::IE_Released, this, &AMyCharacter::RunEnd);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMyCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Weapon"), EInputEvent::IE_Pressed, this, &AMyCharacter::ChangeWeapon);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMyCharacter::Attack);
+
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AMyCharacter::MoveRight);
@@ -102,23 +106,56 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AMyCharacter::Turn);
 }
 
+void AMyCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	Anim = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
+	if (Anim != nullptr) {
+		Anim->OnMontageEnded.AddDynamic(this, &AMyCharacter::AttackEnd);
+		Anim->OnHitCheck.AddLambda([this]()->void {
+			if (CurrentWeapon != UEWeaponType::None) {
+				Weapons[(int32)CurrentWeapon-1]->Attack();
+			}
+			});
+	}
+}
+
+float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float FinalDamage = DamageAmount;
+	if (CurrentHp > 0) {
+		CurrentHp -= FinalDamage;
+	}
+	else {
+		SetActorEnableCollision(false);
+	}
+
+	return FinalDamage;
+}
+
 void AMyCharacter::MoveForward(float NewAxisValue)
 {
+	if (IsAttacking) return;
+	if (CurrentHp < 0) return;
 	AddMovementInput(FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::X), NewAxisValue * CurrentSpeedRate);
 }
 
 void AMyCharacter::MoveRight(float NewAxisValue)
 {
+	if (IsAttacking) return;
+	if (CurrentHp < 0) return;
 	AddMovementInput(FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::Y), NewAxisValue * CurrentSpeedRate);
 }
 
 void AMyCharacter::LookUp(float NewAxisValue)
 {
+	if (CurrentHp < 0) return;
 	AddControllerPitchInput(NewAxisValue);
 }
 
 void AMyCharacter::Turn(float NewAxisValue)
 {
+	if (CurrentHp < 0) return;
 	AddControllerYawInput(NewAxisValue);
 }
 
@@ -157,6 +194,20 @@ void AMyCharacter::ChangeWeapon(FKey key)
 		SetEnableWeapon(Weapons[(int32)CurrentWeapon - 1], true);
 	}
 	ABLOG(Warning, TEXT("Pre Weapon(int) : %d"), (int32)CurrentWeapon)
+}
+
+void AMyCharacter::Attack()
+{
+	if (CurrentHp < 0) return;
+	if (!IsAttacking) {
+		IsAttacking = true;
+		Anim->PlayAttackMontage((int32)CurrentWeapon-1);
+	}
+}
+
+void AMyCharacter::AttackEnd(UAnimMontage* Montage, bool bInterrupted)
+{
+	IsAttacking = false;
 }
 
 void AMyCharacter::InitializeWeapons()
@@ -221,8 +272,13 @@ int AMyCharacter::GetCurrentWeapon()
 
 void AMyCharacter::AddNewWeapon(UEWeaponType NewWeaponType)
 {
-	ABLOG(Log, TEXT("add new Weapon type : %d"), (int32)NewWeaponType);
 	OwnWeapons.Add(NewWeaponType);
 }
+
+bool AMyCharacter::GetDead()
+{
+	return CurrentHp<=0;
+}
+
 
 

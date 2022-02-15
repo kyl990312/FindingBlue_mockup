@@ -16,9 +16,17 @@ class MYPROJECT_API AMyStick : public AMyWeapon
 public:
 	AMyStick();
 
+	virtual void Attack() override;
+
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;	
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+		float AttackRange;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+		float AttackRadius;
 };

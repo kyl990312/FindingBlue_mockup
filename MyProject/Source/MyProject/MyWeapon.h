@@ -22,6 +22,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	virtual void Attack();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category=Weapon)

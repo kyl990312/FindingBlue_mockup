@@ -24,3 +24,8 @@ void AMyWeapon::Tick(float DeltaTime)
 
 }
 
+void AMyWeapon::Attack()
+{
+	
+}
+

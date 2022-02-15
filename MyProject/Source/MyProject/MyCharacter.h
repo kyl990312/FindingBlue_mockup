@@ -44,10 +44,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PostInitializeComponents() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 
 	bool GetIsRunning();
 	int GetCurrentWeapon();
 	void AddNewWeapon(UEWeaponType NewWeaponType);
+	bool GetDead();
 
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
 		USpringArmComponent* SpringArm;
@@ -62,15 +66,25 @@ private:
 	void RunStart();
 	void RunEnd();        
 	void ChangeWeapon(FKey key);
+	void Attack();
+
+	UFUNCTION()
+	void AttackEnd(UAnimMontage* Montage, bool bInterrupted);
 
 	const float DefaultSpeedRate = 0.1f;
 	const float RunSpeedRate = 0.3f;
 	const float RotateRate = 200.0f;
 	float CurrentSpeedRate = 0.0f;
 	bool JumpInput = false;
+	bool IsAttacking = false;
+	const float MaxHp = 100.0f;
+	float CurrentHp;
 	
 	UEWeaponType CurrentWeapon = UEWeaponType::None;
 	UPROPERTY(VisibleAnyWhere, Category=Weapon)
 	TArray<UEWeaponType> OwnWeapons;
 	TArray<class AMyWeapon*> Weapons;
+
+	UPROPERTY()
+	class UMyAnimInstance* Anim;
 };
