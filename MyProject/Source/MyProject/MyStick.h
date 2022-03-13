@@ -24,9 +24,9 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	virtual float GetAttackRange() override;
+
 private:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		float AttackRange;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 		float AttackRadius;
 };

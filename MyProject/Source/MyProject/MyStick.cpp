@@ -39,16 +39,16 @@ void AMyStick::Attack()
 		FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 		float DebugLifeTime = 0.5f;
 
-		DrawDebugCapsule(
-			GetWorld(),
-			Center,
-			HalfHeight,
-			AttackRadius,
-			CapsuleRot,
-			DrawColor,
-			true,
-			DebugLifeTime
-		);
+		//DrawDebugCapsule(
+		//	GetWorld(),
+		//	Center,
+		//	HalfHeight,
+		//	AttackRadius,
+		//	CapsuleRot,
+		//	DrawColor,
+		//	true,
+		//	DebugLifeTime
+		//);
 #endif
 
 		if (bResult) {
@@ -68,4 +68,9 @@ void AMyStick::BeginPlay()
 void AMyStick::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+float AMyStick::GetAttackRange()
+{
+	return 50.0f;
 }

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "MyCharacter.generated.h"
 
+//DECLARE_MULTICAST_DELEGATE_OneParam(FOnHPChanged,float);
+
 UENUM(BlueprintType)
 enum class UEWeaponType : uint8 {
 	None = 0 UMETA(DisplayName = "None"),
@@ -13,6 +15,8 @@ enum class UEWeaponType : uint8 {
 	AR = 2 UMETA(DisplayName = "AR"),
 	Sniper = 3 UMETA(DisplayName = "Sniper"),
 };
+
+DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 
 UCLASS()
 class MYPROJECT_API AMyCharacter : public ACharacter
@@ -27,13 +31,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	enum class EControlMode {
-		FPS,
-		GTA,
+		COMMON,
+		AR_AIM,
+		SNIPER_AIM,
+		NPC,
 	};
 
 	// Called when the game starts or when spawned
 	void SetControlMode(EControlMode ControlMode);
-	EControlMode CurrentControlMode = EControlMode::GTA;
+	EControlMode CurrentControlMode = EControlMode::COMMON;
 
 	void InitializeWeapons();
 	void SetEnableWeapon(class AMyWeapon* Target, bool Enable);
@@ -46,17 +52,26 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void PossessedBy(AController* NewContoller) override;
 
 
 	bool GetIsRunning();
 	int GetCurrentWeapon();
 	void AddNewWeapon(UEWeaponType NewWeaponType);
-	bool GetDead();
+	void GetAttackStartForwardVector(FVector& Start, FVector& Forward);
+
+	UFUNCTION()
+		bool GetCurrentWeaponObject(class AMyWeapon* Weapon);
+	
+	void Attack();
+	FOnAttackEndDelegate OnAttackEnd;
 
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
 		USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
 		UCameraComponent* Camera;
+
+	//FOnHPChanged OnHPChanged;
 
 private:
 	void MoveForward(float NewAxisValue);
@@ -66,22 +81,30 @@ private:
 	void RunStart();
 	void RunEnd();        
 	void ChangeWeapon(FKey key);
-	void Attack();
+	void Aim();
+	void Zoom(float NewAxisValue);
 
 	UFUNCTION()
 	void AttackEnd(UAnimMontage* Montage, bool bInterrupted);
 
 	const float DefaultSpeedRate = 0.1f;
 	const float RunSpeedRate = 0.3f;
-	const float RotateRate = 200.0f;
+	const float RotateRate = 500.0f;
+	const float MinArmLength =100.0f;
+	const float MaxArmLength = 300.0f;
+	const float ArmLengthSpeed = 10.0f;
+
 	float CurrentSpeedRate = 0.0f;
 	bool JumpInput = false;
 	bool IsAttacking = false;
-	const float MaxHp = 100.0f;
+	float MaxHp = 100.0f;
 	float CurrentHp;
+	bool Aimming = false;
+	float CurrentArmLength = 0.0f;
+	float ArmLengthTo = 0.0f;
 	
 	UEWeaponType CurrentWeapon = UEWeaponType::None;
-	UPROPERTY(VisibleAnyWhere, Category=Weapon)
+	UPROPERTY(EditAnywhere, Category=Weapon)
 	TArray<UEWeaponType> OwnWeapons;
 	TArray<class AMyWeapon*> Weapons;
 

@@ -25,9 +25,13 @@ public:
 	
 	virtual void Attack();
 
+	virtual float GetAttackRange();
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category=Weapon)
 	float AttackPower;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	float AttackRange;
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = Weapon)

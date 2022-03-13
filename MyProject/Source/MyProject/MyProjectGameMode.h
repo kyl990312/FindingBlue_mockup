@@ -14,7 +14,18 @@ class AMyProjectGameMode : public AGameModeBase
 public:
 	AMyProjectGameMode();
 
+	void ChangeWidget(TSubclassOf<class UUserWidget> NewWidgetClass);
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<class UUserWidget> StartingWidgetClass;
+	UPROPERTY(VisibleAnywhere)
+		class UUserWidget* CurrentWidget = nullptr;
+	
 };
 
 

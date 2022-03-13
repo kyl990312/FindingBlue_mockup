@@ -29,3 +29,8 @@ void AMyWeapon::Attack()
 	
 }
 
+float AMyWeapon::GetAttackRange()
+{
+	return AttackRange;
+}
+

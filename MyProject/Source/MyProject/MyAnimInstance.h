@@ -18,10 +18,16 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayAttackMontage(int32 CurrentWeapon);
+	void StopAttackMontage();
+
+	void AimmingOnOff(bool value);
 
 private:
 	UFUNCTION()
 	void AnimNotify_HitCheck();
+
+public:
+	void SetDead(bool val);
 
 public:
 	FOnHitCheckDelegate OnHitCheck;
@@ -37,6 +43,8 @@ private:
 		int CurrentWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
 		bool Dead;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
+		bool Aimming;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))

@@ -9,6 +9,8 @@ UMyAnimInstance::UMyAnimInstance() {
 	IsInAir = false;
 	IsRunning = false;
 	CurrentWeapon =0;
+	Dead = false;
+	Aimming = false;
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>ATTACK_MONTAGE(TEXT("/Game/Character/AttackMontage.AttackMontage"));
 	if (ATTACK_MONTAGE.Succeeded()) {
@@ -28,7 +30,6 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			IsInAir = Character->GetCharacterMovement()->IsFalling();
 			IsRunning = Character->GetIsRunning();
 			CurrentWeapon = Character->GetCurrentWeapon();
-			Dead = Character->GetDead();
 		}
 	}
 }
@@ -36,19 +37,24 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UMyAnimInstance::PlayAttackMontage(int32 Weapon)
 {
 	Montage_Play(AttackMontage, 1.0f);
-	switch (Weapon)
-	{
-	case 0:
-		Montage_JumpToSection(FName(TEXT("StickAttack")), AttackMontage);
-		break;
-	case 1:
-		Montage_JumpToSection(FName(TEXT("GunAttackSlow")), AttackMontage);
-		break;
-	}
+}
 
+void UMyAnimInstance::StopAttackMontage()
+{
+	Montage_Stop(0.1f,AttackMontage);
+}
+
+void UMyAnimInstance::AimmingOnOff(bool value)
+{
+	Aimming = value;
 }
 
 void UMyAnimInstance::AnimNotify_HitCheck()
 {
 	OnHitCheck.Broadcast();
+}
+
+void UMyAnimInstance::SetDead(bool val)
+{
+	Dead = val;
 }

@@ -3,10 +3,11 @@
 
 #include "MyGun.h"
 #include "DrawDebugHelpers.h"
+#include"MyCharacter.h"
 
 AMyGun::AMyGun() {
 	AttackPower = 100.0f;
-	AttackRange = 500.0f;
+	AttackRange = 1000.0f;
 	BulletRadius = 5.0f;
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("STICK"));
@@ -35,8 +36,13 @@ void AMyGun::Attack()
 		FCollisionQueryParams Params(NAME_None, false, this);
 		Params.AddIgnoredActor(Parent);
 
-		FVector Forward = Parent->GetActorForwardVector();
-		FVector Start = Parent->GetActorLocation();
+		auto Character = Cast<AMyCharacter>(Parent);
+
+		FVector Forward = FVector::ZeroVector;
+		FVector Start = FVector::ZeroVector;
+		if (Character != nullptr) {
+			Character->GetAttackStartForwardVector(Start, Forward);
+		}
 		bool bResult = GetWorld()->SweepSingleByChannel(Result, Start, Start + Forward * AttackRange, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel12, FCollisionShape::MakeSphere(BulletRadius), Params);
 
 #if ENABLE_DRAW_DEBUG
@@ -65,5 +71,11 @@ void AMyGun::Attack()
 				UGameplayStatics::ApplyDamage(Cast<AActor>(Result.Actor), AttackPower, NULL, Parent, NULL);
 			}
 		}
+
 	}
+}
+
+float AMyGun::GetAttackRange()
+{
+	return 200.0f;
 }
