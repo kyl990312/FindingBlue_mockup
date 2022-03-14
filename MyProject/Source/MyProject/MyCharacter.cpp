@@ -134,7 +134,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMyCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Weapon"), EInputEvent::IE_Pressed, this, &AMyCharacter::ChangeWeapon);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMyCharacter::Attack);
-	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, Anim, &UMyAnimInstance::StopAttackMontage);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, this, &AMyCharacter::AttackEnd);
 	PlayerInputComponent->BindAction(TEXT("Aim"), EInputEvent::IE_Pressed, this, &AMyCharacter::Aim);
 
 
@@ -150,7 +150,7 @@ void AMyCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	Anim = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
 	if (Anim != nullptr) {
-		Anim->OnMontageEnded.AddDynamic(this, &AMyCharacter::AttackEnd);
+		//Anim->OnMontageEnded.AddDynamic(this, &AMyCharacter::AttackEnd);
 		Anim->OnHitCheck.AddLambda([this]()->void {
 			if (CurrentWeapon != UEWeaponType::None) {
 				Weapons[(int32)CurrentWeapon-1]->Attack();
@@ -323,6 +323,13 @@ void AMyCharacter::Zoom(float NewAxisValue)
 void AMyCharacter::AttackEnd(UAnimMontage* Montage, bool bInterrupted)
 {
 	IsAttacking = false;
+	OnAttackEnd.Broadcast();
+}
+
+void AMyCharacter::AttackEnd()
+{
+	IsAttacking = false;
+	Anim->StopAttackMontage();
 	OnAttackEnd.Broadcast();
 }
 

@@ -54,6 +54,12 @@ void UMyAnimInstance::AnimNotify_HitCheck()
 	OnHitCheck.Broadcast();
 }
 
+void UMyAnimInstance::AnimNotify_EndAttack()
+{
+	auto Character = Cast<AMyCharacter>(TryGetPawnOwner());
+	if (Character != nullptr) Character->OnAttackEnd.Broadcast();
+}
+
 void UMyAnimInstance::SetDead(bool val)
 {
 	Dead = val;

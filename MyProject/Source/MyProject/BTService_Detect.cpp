@@ -23,7 +23,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	UWorld* World = ControllingPawn->GetWorld();
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 200.0f;
+	float DetectRadius = 300.0f;
 
 
 	if (World == nullptr) return;
@@ -47,11 +47,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 				DrawDebugPoint(World, Character->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
 				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Character->GetActorLocation(), FColor::Blue, false, 0.2f);
+				Cast<AMyCharacter>(ControllingPawn)->RunStart();
 				return;
 			}
 		}
 	}
-
+	Cast<AMyCharacter>(ControllingPawn)->RunEnd();
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AMyEnemyAIController::TargetKey, nullptr);
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 }

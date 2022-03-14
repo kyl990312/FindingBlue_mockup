@@ -6,6 +6,7 @@
 #include "MyCharacter.h"
 #include "BehaviorTree/BlackBoardComponent.h"
 #include "MyWeapon.h"
+#include "DrawDebugHelpers.h"
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange() {
 	NodeName = TEXT("CanAttack");
@@ -30,7 +31,14 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
             ABLOG(Warning, TEXT("Weapon isn't set"));
         }
     }
-
     bResult = (Target->GetDistanceTo(ControllingPawn) <= AttackRange);
+    if (!bResult) Cast<AMyCharacter>(ControllingPawn)->AttackEnd();
+
+#if ENABLE_DRAW_DEBUG
+    UWorld* World = ControllingPawn->GetWorld();
+    FVector Center = ControllingPawn->GetActorLocation();
+    DrawDebugSphere(World, Center, AttackRange, 16, bResult ? FColor::Blue : FColor::Yellow, false, 0.2f);
+#endif
+
     return bResult;
 }

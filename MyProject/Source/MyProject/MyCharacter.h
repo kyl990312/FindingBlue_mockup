@@ -64,7 +64,11 @@ public:
 		bool GetCurrentWeaponObject(class AMyWeapon* Weapon);
 	
 	void Attack();
+	void AttackEnd();
 	FOnAttackEndDelegate OnAttackEnd;
+
+	void RunStart();
+	void RunEnd();
 
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
 		USpringArmComponent* SpringArm;
@@ -77,9 +81,7 @@ private:
 	void MoveForward(float NewAxisValue);
 	void MoveRight(float NewAxisValue);
 	void LookUp(float NewAxisValue);
-	void Turn(float NewAxisValue);
-	void RunStart();
-	void RunEnd();        
+	void Turn(float NewAxisValue);  
 	void ChangeWeapon(FKey key);
 	void Aim();
 	void Zoom(float NewAxisValue);

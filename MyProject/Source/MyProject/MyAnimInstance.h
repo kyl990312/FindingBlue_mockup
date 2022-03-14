@@ -25,6 +25,8 @@ public:
 private:
 	UFUNCTION()
 	void AnimNotify_HitCheck();
+	UFUNCTION()
+		void AnimNotify_EndAttack();
 
 public:
 	void SetDead(bool val);

@@ -31,6 +31,6 @@ void AMyWeapon::Attack()
 
 float AMyWeapon::GetAttackRange()
 {
-	return AttackRange;
+	return 0.0f;
 }
 

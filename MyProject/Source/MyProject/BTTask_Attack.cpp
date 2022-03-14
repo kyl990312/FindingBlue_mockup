@@ -21,6 +21,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	Character->Attack();
 	IsAttacking = true;
 	Character->OnAttackEnd.AddLambda([this]()->void {
+		ABLOG(Warning, TEXT("Stop AI Attack!"));
 		IsAttacking = false;
 		});
 
